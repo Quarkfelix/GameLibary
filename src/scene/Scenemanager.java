@@ -3,57 +3,75 @@ package scene;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import exeptions.IdentifierNotAvailableException;
+import exeptions.IdentifierNotFoundException;
 import objects.GameObject;
 import objects.GameObjectTypes;
 import objects.Rectangle;
+import rendering.Camera;
 
 /*
  * the scenemanager is the main accesspoint for the gamelibary. 
- * it is probably best to create a scsnemanagerobject right after you initialized a gameobject and then use it
+ * it is probably best to create a scenemanagerobject right after you initialized a gameobject and then use it
  * to add delete objects etc.
- * The scenemanager has one scene by default but more can be addet.
+ * The scenemanager has one scene by default but more can be added.
+ * 
+ * Scenemanager only gives acces to the scenes. Acces to objects is handled in The scene object
 */
 
-
 public class Scenemanager {
-	//scenes
+	// scenes
 	private ArrayList<Scene> scenes;
-	private int sceneindex = 0;
-	
+	private String activeScene = "defaultScene";
+
+	// camera
+	private static Camera camera = new Camera();
+
 //Constructor ------------------------------------------------------------------------------------------
 	public Scenemanager() {
 		scenes = new ArrayList();
-		scenes.add(new Scene());
+		scenes.add(new Scene("defaultScene"));
 	}
 //run --------------------------------------------------------------------------------------------------
 
 //methods ----------------------------------------------------------------------------------------------	
-	// gives the active scene the command to add a object of given type
-	public void createObject(GameObjectTypes type) {
-		scenes.get(sceneindex).addObject(type);
+	public void createScene(String identifier) {
+		scenes.add(new Scene(identifier));
 	}
 
-	// gives the active scene the command to delete a object of given type at given index
-	public void deleteObjcet(int index, GameObjectTypes type) {
-		scenes.get(sceneindex).deleteObject(index, type);
-	}
 //getter-setter ----------------------------------------------------------------------------------------
-	//setzt scene aktiv (noch mit namen hinzufügen)
-	public void setSceneActive(int index) {
-		
+	//scene
+	public void setActiveScene(String identifier) {
+		for (Scene scene : scenes) {
+			if(scene.getIdentifier() == identifier) {
+				activeScene = identifier;
+				break;
+			}
+			System.out.println("0");
+		}
+		System.out.println("broken");
+		//exception muss noch hier rein
 	}
-	
+
 	public Scene getActiveScene() {
-		return scenes.get(sceneindex);
+		for (Scene scene : scenes) {
+			if(scene.getIdentifier() == activeScene) 
+				return scene;
+		}
+		return null;
 	}
-	
-	// returns all objects of active scene as ArrayList of type GameObject
-	public ArrayList<GameObject> getObjects() {
-		return scenes.get(sceneindex).getObjects();
+
+	// returns camera
+	public static Camera getCamera() {
+		return camera;
 	}
+
 //paint ------------------------------------------------------------------------------------------------
-	
+
 	public void paint(Graphics2D g) {
-		scenes.get(sceneindex).paint(g);
+		for (Scene scene : scenes) {
+			if(scene.getIdentifier() == activeScene) 
+				scene.paint(g);
+		}	
 	}
 }
